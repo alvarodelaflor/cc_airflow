@@ -77,5 +77,5 @@ class Save:
 
 if __name__ == "__main__":
     d = Save()
-    g = d.get_data_airflow()
+    g = d.get_data()
 
