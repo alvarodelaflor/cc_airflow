@@ -82,8 +82,8 @@ SaveData = PythonOperator(
                     )
 
 # Ejecutamos los tests
-DoTest = BashOperator(
-                    task_id='do_test',
+DoTests = BashOperator(
+                    task_id='do_tests',
                     depends_on_past=False,
                     bash_command='cd /tmp/workflow/service ; pytest tests.py',
                     dag=dag
@@ -108,4 +108,4 @@ DeployApi = BashOperator(
                     )
 
 ## ORDEN DE EJECUCIÓN DE TAREAS
-SetupEnvironment >> [DownloadHumidity, DownloadTemperature, DownloadRepository] >> UnzipData >> SaveData >> DoTest >> [DeployArima, DeployApi]
+SetupEnvironment >> [DownloadHumidity, DownloadTemperature, DownloadRepository] >> UnzipData >> SaveData >> DoTests >> [DeployArima, DeployApi]
