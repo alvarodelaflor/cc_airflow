@@ -3,8 +3,6 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
-from save import Save
-import sys
 
 default_args = {
     'owner': 'airflow',
@@ -20,9 +18,11 @@ default_args = {
 
 def get_data():
     """Función que captura, preprocesa y almacena los datos"""
+    import sys
     sys.path.append('/tmp/workflow/service')
+    from save import Save
     data_aux = Save()
-    data_aux.get_data()
+    data_aux.get_data_airflow()
 
 
 # Inicialización del grafo de tareas
@@ -82,10 +82,10 @@ SaveData = PythonOperator(
                     )
 
 # Ejecutamos los tests
-DoTests = BashOperator(
-                    task_id='do_tests',
+DoTest = BashOperator(
+                    task_id='do_test',
                     depends_on_past=False,
-                    bash_command='cd /tmp/workflow/servicio ; pytest tests.py',
+                    bash_command='cd /tmp/workflow/service ; pytest tests.py',
                     dag=dag
                     )
 
@@ -108,4 +108,4 @@ DeployApi = BashOperator(
                     )
 
 ## ORDEN DE EJECUCIÓN DE TAREAS
-SetupEnvironment >> [DownloadHumidity, DownloadTemperature, DownloadRepository] >> UnzipData >> SaveData >> DoTests >> [DeployArima, DeployApi]
+SetupEnvironment >> [DownloadHumidity, DownloadTemperature, DownloadRepository] >> UnzipData >> SaveData >> DoTest >> [DeployArima, DeployApi]
