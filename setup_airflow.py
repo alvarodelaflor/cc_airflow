@@ -3,6 +3,8 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
+from save import Save
+import sys
 
 default_args = {
     'owner': 'airflow',
@@ -18,10 +20,8 @@ default_args = {
 
 def get_data():
     """Función que captura, preprocesa y almacena los datos"""
-    import sys
     sys.path.append('/tmp/workflow/service')
-    import data
-    data_aux = data.Data()
+    data_aux = Save()
     data_aux.get_data()
 
 
@@ -61,7 +61,7 @@ DownloadTemperature = BashOperator(
 DownloadRepository = BashOperator(
                         task_id='download_repository',
                         depends_on_past=False,
-                        bash_command='rm -rf /tmp/workflow/servicio/ ; mkdir /tmp/workflow/servicio ; git clone https://github.com/alvarodelaflor/cc_airflow.git /tmp/workflow/service',
+                        bash_command='rm -rf /tmp/workflow/service/ ; mkdir /tmp/workflow/service ; git clone https://github.com/alvarodelaflor/cc_airflow.git /tmp/workflow/service',
                         dag=dag
                         )
 

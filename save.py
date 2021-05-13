@@ -14,7 +14,7 @@ import pandas
 import pymongo
 
 
-class Data:
+class Save:
     user = 'admin'
     password = 'pass'
 
@@ -48,5 +48,6 @@ class Data:
 
 
 if __name__ == "__main__":
-    d = Data()
+    d = Save()
     g = d.get_data()
+
