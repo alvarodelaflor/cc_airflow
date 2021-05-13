@@ -94,7 +94,7 @@ DoTest = BashOperator(
 DeployArima = BashOperator(
                     task_id='desploy_arima',
                     depends_on_past=False,
-                    bash_command='cd /tmp/workflow/service ; docker build -f DockerfileV1 -t servicio_v1 . ; docker run -d -e PORT=8000 -e -p 8000:8000 service_v1',
+                    bash_command='cd /tmp/workflow/servicio ; docker build -f DockerfileV1 -t servicio_v1 . ; docker run -d -e PORT=8000 -e 8000:8000 servicio_v1',
                     dag=dag
                     )
 
