@@ -11,7 +11,7 @@ default_args = {
     'email': ['alvdebon@correo.ugr.es'],
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
+    'retries': 0,
     'retry_delay': timedelta(minutes=5),
 }
 
@@ -89,12 +89,20 @@ DoTests = BashOperator(
                     dag=dag
                     )
 
+# Remove running docker containers
+SetupDocker = BashOperator(
+                    task_id='setup_docker',
+                    depends_on_past=False,
+                    bash_command='cd /tmp/workflow/service ; make step1',
+                    dag=dag
+                    )
+
 # DesplegarArima: tarea encargada de construir el contenedor del primer microservicio
 # y desplegarlo para acceder a él a través de la dirección 0.0.0.0:8000/
 DeployArima = BashOperator(
                     task_id='desploy_arima',
                     depends_on_past=False,
-                    bash_command='cd /tmp/workflow/service ; docker build -f DockerfileV1 -t service_v1 . ; docker run -d -p 8000:8000 -e PORT=8000 servicio_v1',
+                    bash_command='cd /tmp/workflow/service ; docker build -f DockerfileV1 -t service_v1 . ; docker run -d -p 8001:8001 -e PORT=8001 service_v1',
                     dag=dag
                     )
 
@@ -103,9 +111,9 @@ DeployArima = BashOperator(
 DeployApi = BashOperator(
                     task_id='deploy_api',
                     depends_on_past=False,
-                    bash_command='cd /tmp/workflow/service ; docker build -f DockerfileV2 -t service_v2 . ; docker run -d -p 8001:8001 -e PORT=8001 service_v2',
+                    bash_command='cd /tmp/workflow/service ; docker build -f DockerfileV2 -t service_v2 . ; docker run -d -p 8002:8002 -e PORT=8002 service_v2',
                     dag=dag
                     )
 
 ## ORDEN DE EJECUCIÓN DE TAREAS
-SetupEnvironment >> [DownloadHumidity, DownloadTemperature, DownloadRepository] >> UnzipData >> SaveData >> DoTests >> [DeployArima, DeployApi]
+SetupEnvironment >> [DownloadHumidity, DownloadTemperature, DownloadRepository] >> UnzipData >> SaveData >> DoTests >> SetupDocker >> [DeployArima, DeployApi]
